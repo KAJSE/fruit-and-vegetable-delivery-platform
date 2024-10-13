@@ -1,0 +1,48 @@
+const express = require('express');
+const router = express.Router();
+
+// 支付请求处理
+router.post('/pay', (req, res) => {
+  const { orderId, paymentMethod, amount } = req.body;
+  // 支付逻辑
+  res.json({ message: 'Payment successful', orderId, amount });
+});
+
+module.exports = router;
+import React, { useState } from 'react';
+import axios from 'axios';
+
+function Payment({ orderId }) {
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [amount, setAmount] = useState('');
+
+  const handlePayment = async () => {
+    const response = await axios.post('/api/payment/pay', {
+      orderId,
+      paymentMethod,
+      amount,
+    });
+    alert(response.data.message);
+  };
+
+  return (
+    <div>
+      <h2>Payment</h2>
+      <input
+        type="text"
+        placeholder="Payment Method"
+        value={paymentMethod}
+        onChange={(e) => setPaymentMethod(e.target.value)}
+      />
+      <input
+        type="number"
+        placeholder="Amount"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+      />
+      <button onClick={handlePayment}>Pay</button>
+    </div>
+  );
+}
+
+export default Payment;
