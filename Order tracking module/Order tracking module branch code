@@ -1,0 +1,41 @@
+const express = require('express');
+const router = express.Router();
+
+const orders = [
+  { id: 1, product: 'Apples', status: 'Delivered' },
+  { id: 2, product: 'Bananas', status: 'In transit' },
+];
+
+// 获取订单信息
+router.get('/', (req, res) => {
+  res.json(orders);
+});
+
+module.exports = router;
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function OrderTracking() {
+  const [orders, setOrders] = useState([]);
+
+  useEffect(() => {
+    const fetchOrders = async () => {
+      const response = await axios.get('/api/orders');
+      setOrders(response.data);
+    };
+    fetchOrders();
+  }, []);
+
+  return (
+    <div>
+      <h2>Order Tracking</h2>
+      <ul>
+        {orders.map((order) => (
+          <li key={order.id}>{order.product} - {order.status}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default OrderTracking;
