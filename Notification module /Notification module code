@@ -1,0 +1,41 @@
+const express = require('express');
+const router = express.Router();
+
+const notifications = [
+  { id: 1, message: 'Your order has been shipped' },
+  { id: 2, message: 'New promotions available now!' },
+];
+
+// 获取通知信息
+router.get('/', (req, res) => {
+  res.json(notifications);
+});
+
+module.exports = router;
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function Notifications() {
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      const response = await axios.get('/api/notifications');
+      setNotifications(response.data);
+    };
+    fetchNotifications();
+  }, []);
+
+  return (
+    <div>
+      <h2>Notifications</h2>
+      <ul>
+        {notifications.map((notification) => (
+          <li key={notification.id}>{notification.message}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default Notifications;
