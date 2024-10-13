@@ -1,0 +1,40 @@
+const express = require('express');
+const router = express.Router();
+
+// 获取当前促销活动
+router.get('/', (req, res) => {
+  const promotions = [
+    { id: 1, title: 'Buy 1 Get 1 Free', description: 'On selected items' },
+    { id: 2, title: '20% Off', description: 'On orders above $50' },
+  ];
+  res.json(promotions);
+});
+
+module.exports = router;
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function Promotions() {
+  const [promotions, setPromotions] = useState([]);
+
+  useEffect(() => {
+    const fetchPromotions = async () => {
+      const response = await axios.get('/api/promotions');
+      setPromotions(response.data);
+    };
+    fetchPromotions();
+  }, []);
+
+  return (
+    <div>
+      <h2>Current Promotions</h2>
+      <ul>
+        {promotions.map((promo) => (
+          <li key={promo.id}>{promo.title} - {promo.description}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export default Promotions;
