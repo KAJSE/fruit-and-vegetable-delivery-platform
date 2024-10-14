@@ -1,0 +1,82 @@
+const express = require('express');
+const router = express.Router();
+
+const reviews = [
+  { productId: 1, userId: 1, rating: 5, comment: 'Great product!' },
+  { productId: 2, userId: 2, rating: 4, comment: 'Good quality, fast delivery.' },
+];
+
+// 获取某个产品的评论
+router.get('/:productId', (req, res) => {
+  const { productId } = req.params;
+  const productReviews = reviews.filter((review) => review.productId == productId);
+  res.json(productReviews);
+});
+
+// 添加新的评论
+router.post('/', (req, res) => {
+  const { productId, userId, rating, comment } = req.body;
+  reviews.push({ productId, userId, rating, comment });
+  res.status(201).json({ message: 'Review added' });
+});
+
+module.exports = router;
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function Reviews({ productId }) {
+  const [reviews, setReviews] = useState([]);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      const response = await axios.get(`/api/reviews/${productId}`);
+      setReviews(response.data);
+    };
+    fetchReviews();
+  }, [productId]);
+
+  const handleReviewSubmit = async () => {
+    await axios.post('/api/reviews', {
+      productId,
+      userId: 1, // 假设用户ID是1
+      rating,
+      comment,
+    });
+    setRating(0);
+    setComment('');
+    alert('Review submitted');
+  };
+
+  return (
+    <div>
+      <h2>Product Reviews</h2>
+      <ul>
+        {reviews.map((review, index) => (
+          <li key={index}>{review.comment} - {review.rating} stars</li>
+        ))}
+      </ul>
+
+      <div>
+        <h3>Add Review</h3>
+        <input
+          type="number"
+          placeholder="Rating"
+          value={rating}
+          onChange={(e) => setRating(e.target.value)}
+          max="5"
+          min="1"
+        />
+        <textarea
+          placeholder="Comment"
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+        />
+        <button onClick={handleReviewSubmit}>Submit Review</button>
+      </div>
+    </div>
+  );
+}
+
+export default Reviews;
