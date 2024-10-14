@@ -1,0 +1,23 @@
+const express = require('express');
+const router = express.Router();
+
+const messages = [
+  { id: 1, userId: 1, message: 'Where is my order?' },
+  { id: 2, userId: 2, message: 'How can I cancel my order?' },
+];
+
+// 获取客服消息
+router.get('/:userId', (req, res) => {
+  const { userId } = req.params;
+  const userMessages = messages.filter((msg) => msg.userId == userId);
+  res.json(userMessages);
+});
+
+// 添加客服消息
+router.post('/', (req, res) => {
+  const { userId, message } = req.body;
+  messages.push({ id: messages.length + 1, userId, message });
+  res.status(201).json({ message: 'Message received' });
+});
+
+module.exports = router;
