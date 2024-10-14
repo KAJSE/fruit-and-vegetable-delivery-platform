@@ -1,0 +1,85 @@
+#假设支付系统中有一个错误，前端未正确显示支付状态，导致用户在付款后看不到结果。支付API未正确处理错误返回，导致前端接收不到正确的支付结果
+# 从主分支创建修复分支
+git checkout main
+git pull origin main
+git checkout -b hotfix/payment-issue
+import React, { useState } from 'react';
+import axios from 'axios';
+
+function Payment({ orderId }) {
+  const [paymentMethod, setPaymentMethod] = useState('');
+  const [amount, setAmount] = useState('');
+  const [paymentStatus, setPaymentStatus] = useState('');  // 新增状态
+
+  const handlePayment = async () => {
+    try {
+      const response = await axios.post('/api/payment/pay', {
+        orderId,
+        paymentMethod,
+        amount,
+      });
+      setPaymentStatus('Payment successful');  // 设置支付成功的状态
+    } catch (error) {
+      setPaymentStatus('Payment failed');  // 错误处理
+    }
+  };
+
+  return (
+    <div>
+      <h2>Payment</h2>
+      <input
+        type="text"
+        placeholder="Payment Method"
+        value={paymentMethod}
+        onChange={(e) => setPaymentMethod(e.target.value)}
+      />
+      <input
+        type="number"
+        placeholder="Amount"
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+      />
+      <button onClick={handlePayment}>Pay</button>
+
+      {/* 显示支付状态 */}
+      {paymentStatus && <p>{paymentStatus}</p>}
+    </div>
+  );
+}
+
+export default Payment;
+const express = require('express');
+const router = express.Router();
+
+router.post('/pay', (req, res) => {
+  const { orderId, paymentMethod, amount } = req.body;
+
+  if (!paymentMethod || !amount) {
+    return res.status(400).json({ message: 'Invalid payment data' });  // 错误处理
+  }
+
+  // 支付逻辑
+  if (amount > 0) {
+    res.json({ message: 'Payment successful', orderId, amount });
+  } else {
+    res.status(500).json({ message: 'Payment failed' });  // 模拟失败场景
+  }
+});
+
+module.exports = router;
+git add .
+git commit -m "Fix payment status display and API error handling"
+git push origin hotfix/payment-issue
+# 切换到主分支并合并修复
+git checkout main
+git pull origin main
+git merge hotfix/payment-issue
+git push origin main
+
+# 切换到开发分支并合并修复
+git checkout develop
+git pull origin develop
+git merge hotfix/payment-issue
+git push origin develop
+git branch -d hotfix/payment-issue
+git push origin --delete hotfix/payment-issue
