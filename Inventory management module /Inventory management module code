@@ -1,0 +1,77 @@
+const express = require('express');
+const router = express.Router();
+
+let inventory = [
+  { id: 1, product: 'Apples', quantity: 100 },
+  { id: 2, product: 'Bananas', quantity: 150 },
+];
+
+// 获取库存信息
+router.get('/', (req, res) => {
+  res.json(inventory);
+});
+
+// 更新库存
+router.post('/update', (req, res) => {
+  const { productId, quantity } = req.body;
+  const product = inventory.find((item) => item.id === productId);
+  if (product) {
+    product.quantity = quantity;
+    res.json({ message: 'Inventory updated', product });
+  } else {
+    res.status(404).json({ message: 'Product not found' });
+  }
+});
+
+module.exports = router;
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+function InventoryManagement() {
+  const [inventory, setInventory] = useState([]);
+  const [quantity, setQuantity] = useState(0);
+  const [productId, setProductId] = useState(null);
+
+  useEffect(() => {
+    const fetchInventory = async () => {
+      const response = await axios.get('/api/inventory');
+      setInventory(response.data);
+    };
+    fetchInventory();
+  }, []);
+
+  const handleUpdate = async () => {
+    await axios.post('/api/inventory/update', { productId, quantity });
+    alert('Inventory updated');
+  };
+
+  return (
+    <div>
+      <h2>Inventory Management</h2>
+      <ul>
+        {inventory.map((item) => (
+          <li key={item.id}>{item.product} - {item.quantity} units</li>
+        ))}
+      </ul>
+
+      <div>
+        <h3>Update Inventory</h3>
+        <select onChange={(e) => setProductId(e.target.value)}>
+          <option>Select product</option>
+          {inventory.map((item) => (
+            <option key={item.id} value={item.id}>{item.product}</option>
+          ))}
+        </select>
+        <input
+          type="number"
+          placeholder="New Quantity"
+          value={quantity}
+          onChange={(e) => setQuantity(e.target.value)}
+        />
+        <button onClick={handleUpdate}>Update</button>
+      </div>
+    </div>
+  );
+}
+
+export default InventoryManagement;
